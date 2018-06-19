@@ -1,0 +1,116 @@
+version: '3'
+
+services: 
+  master1:
+    image: shiguanghuxian/seaweedfs
+    ports:
+      - 9333:9333
+    volumes: 
+      - ./master1:/data
+    command: 'master -port=9333 -ip.bind="0.0.0.0" -peers=master1:9333,master2:9334,master3:9335'
+    networks:
+      - "weednet"
+  master2:
+    image: shiguanghuxian/seaweedfs
+    ports:
+      - 9334:9334
+    volumes: 
+      - ./master2:/data
+    command: 'master -port=9334 -ip.bind="0.0.0.0" -peers=master1:9333,master2:9334,master3:9335'
+    networks:
+      - "weednet"
+  master3:
+    image: shiguanghuxian/seaweedfs
+    ports:
+      - 9335:9335
+    volumes: 
+      - ./master3:/data
+    command: 'master -port=9335 -ip.bind="0.0.0.0" -peers=master1:9333,master2:9334,master3:9335'
+    networks:
+      - "weednet"
+
+  haproxy1:
+    image: haproxy:latest
+    ports:
+      - 9332:9332
+    volumes: 
+      - ./haproxy1:/usr/local/etc/haproxy
+    links: 
+      - master1
+      - master2
+      - master3
+    networks:
+      - "weednet"
+
+  volume1:
+    image: shiguanghuxian/seaweedfs
+    ports:
+      - 8080:8080
+    volumes: 
+      - ./data1:/data
+    command: 'volume -max=5 -port=8080 -ip="xxx.xxx.xxx.x" -ip.bind="0.0.0.0" -mserver=master1:9333'
+    depends_on: 
+      - master1
+      - master2
+      - master3
+    links: 
+      - master1
+      - master2
+      - master3
+    networks:
+      - "weednet"
+  volume2:
+    image: shiguanghuxian/seaweedfs
+    ports:
+      - 8081:8081
+    volumes: 
+      - ./data2:/data
+    command: 'volume -max=5 -port=8081 -ip="xxx.xxx.xxx.x" -ip.bind="0.0.0.0" -mserver=master1:9333'
+    depends_on: 
+      - master1
+      - master2
+      - master3
+    links: 
+      - master1
+      - master2
+      - master3
+    networks:
+      - "weednet"
+  volume3:
+    image: shiguanghuxian/seaweedfs
+    ports:
+      - 8082:8082
+    volumes: 
+      - ./data3:/data
+    command: 'volume -max=5 -port=8082 -ip="xxx.xxx.xxx.x" -ip.bind="0.0.0.0" -mserver=master1:9333'
+    depends_on: 
+      - master1
+      - master2
+      - master3
+    links: 
+      - master1
+      - master2
+      - master3
+    networks:
+      - "weednet"
+  volume4:
+    image: shiguanghuxian/seaweedfs
+    ports:
+      - 8083:8083
+    volumes: 
+      - ./data4:/data
+    command: 'volume -max=5 -port=8083 -ip="xxx.xxx.xxx.x" -ip.bind="0.0.0.0" -mserver=master1:9333'
+    depends_on: 
+      - master1
+      - master2
+      - master3
+    links: 
+      - master1
+      - master2
+      - master3
+    networks:
+      - "weednet"
+
+networks: 
+  weednet: 
+    driver: bridge # 桥接网络
