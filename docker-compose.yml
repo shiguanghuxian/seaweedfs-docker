@@ -17,6 +17,8 @@ services:
     volumes: 
       - ./master2:/data
     command: 'master -port=9334 -ip.bind="0.0.0.0" -peers=master1:9333,master2:9334,master3:9335'
+    depends_on:
+      - master1
     networks:
       - "weednet"
   master3:
@@ -26,6 +28,8 @@ services:
     volumes: 
       - ./master3:/data
     command: 'master -port=9335 -ip.bind="0.0.0.0" -peers=master1:9333,master2:9334,master3:9335'
+    depends_on:
+      - master2
     networks:
       - "weednet"
 
